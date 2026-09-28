@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vidTailor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232060a7'/%3E%3Cpath d='M12 9l12 7-12 7z' fill='%23fff'/%3E%3C/svg%3E">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="#project">vidTailor</a>
+  </header>
+
+  <nav class="menu" aria-label="Sections">
+    <div class="menu-inner">
+      <a href="#project" data-section="project">Project details</a>
+      <a href="#research" data-section="research">Research</a>
+      <a href="#scripting" data-section="scripting">Scripting</a>
+      <a href="#save" data-section="save">Save</a>
+    </div>
+  </nav>
+
+  <main>
+    <div id="api-banner" class="banner" hidden>
+      No Anthropic API key found on the server, so Research and Generate Script won't work yet.
+      Add <code>ANTHROPIC_API_KEY</code> to the <code>.env</code> file and restart the app (see README.md).
+    </div>
+
+    <!-- 1) Project details -->
+    <section id="project" class="section">
+      <h2>Project details</h2>
+
+      <form id="project-form" class="stack narrow" novalidate>
+        <label for="project-title">Title</label>
+        <input id="project-title" type="text" maxlength="200" placeholder="e.g. The Rise of Electric Aviation" autocomplete="off">
+
+        <label for="project-description">Project description</label>
+        <textarea id="project-description" rows="5" placeholder="What is this video about, who is it for, and what should viewers take away?"></textarea>
+
+        <label for="keyword-input">Keywords</label>
+        <div class="chip-input" id="keyword-box">
+          <ul class="chips" id="keyword-chips"></ul>
+          <input id="keyword-input" type="text" placeholder="Type a keyword and press Enter" autocomplete="off">
+        </div>
+
+        <p class="form-error" id="project-error" role="alert" hidden></p>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+
+      <div id="project-view" class="stack narrow" hidden>
+        <h3 id="view-title" class="project-title"></h3>
+        <p id="view-description" class="justify"></p>
+        <ul class="chips chips-static" id="view-keywords"></ul>
+        <button type="button" id="project-edit" class="btn btn-secondary">Edit</button>
+      </div>
+    </section>
+
+    <!-- 2) Research -->
+    <section id="research" class="section">
+      <h2>Research</h2>
+      <div class="split">
+        <div class="panel panel-input">
+          <form id="research-form" class="stack" novalidate>
+            <label for="research-keyword">Enter a keyword</label>
+            <input id="research-keyword" type="text" maxlength="300" placeholder="Subject to research" autocomplete="off">
+            <div id="research-suggestions" class="suggestions" hidden>
+              <span class="hint">From your project:</span>
+              <ul class="chips" id="suggestion-chips"></ul>
+            </div>
+            <button type="submit" class="btn btn-primary" id="research-btn">Research</button>
+            <p class="status" id="research-status" role="status" aria-live="polite"></p>
+          </form>
+          <p class="hint justify">
+            Research searches the web and compiles a concise brief (2,000 words or less, excluding headers and
+            references) with cited sources at the end.
+          </p>
+        </div>
+
+        <div class="panel panel-output">
+          <article class="doc-viewer" id="research-viewer" tabindex="0"></article>
+          <h3 class="list-title">Generated documents</h3>
+          <ul class="doc-list" id="research-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3) Scripting -->
+    <section id="scripting" class="section">
+      <h2>Scripting</h2>
+      <div class="split">
+        <div class="panel panel-input">
+          <form id="script-form" class="stack" novalidate>
+            <fieldset class="pick-docs">
+              <legend>Research documents to include</legend>
+              <ul class="check-list" id="script-sources"></ul>
+              <div class="link-row" id="script-select-row">
+                <button type="button" class="link-btn" data-select="all">Select all</button>
+                <button type="button" class="link-btn" data-select="none">Select none</button>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Script length needed</legend>
+              <div class="duration">
+                <label>
+                  <input id="script-minutes" type="number" min="0" max="180" step="1" inputmode="numeric">
+                  <span>minutes</span>
+                </label>
+                <label>
+                  <input id="script-seconds" type="number" min="0" max="59" step="1" inputmode="numeric">
+                  <span>seconds</span>
+                </label>
+              </div>
+              <p class="hint" id="script-estimate"></p>
+            </fieldset>
+
+            <button type="submit" class="btn btn-primary" id="script-btn">Generate Script</button>
+            <p class="status" id="script-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="panel panel-output">
+          <article class="doc-viewer" id="script-viewer" tabindex="0"></article>
+          <h3 class="list-title">Generated documents</h3>
+          <ul class="doc-list" id="script-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4) Save / clear -->
+    <section id="save" class="section">
+      <h2>Save</h2>
+      <p class="justify narrow">
+        Your work is saved in this browser automatically and will still be here after closing the browser or losing
+        your connection. Use Save Project to put copies of your documents in a folder on this PC.
+      </p>
+      <div class="button-row">
+        <button type="button" class="btn btn-primary" id="save-project-btn">Save Project</button>
+        <button type="button" class="btn btn-danger" id="clear-project-btn">Clear Project Page</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">vidTailor &middot; private workspace</footer>
+
+  <!-- Save Project dialog -->
+  <dialog id="save-dialog" class="dialog" aria-labelledby="save-dialog-title">
+    <form method="dialog" id="save-form" class="stack">
+      <h2 id="save-dialog-title">Save Project</h2>
+      <p class="hint">Choose the documents to download. They are saved together in a new folder.</p>
+      <div class="link-row">
+        <button type="button" class="link-btn" data-save-select="all">Select all</button>
+        <button type="button" class="link-btn" data-save-select="none">Select none</button>
+      </div>
+      <div id="save-choices" class="save-choices"></div>
+      <label for="save-format">File format</label>
+      <select id="save-format">
+        <option value="docx">Word document (.docx)</option>
+        <option value="txt">Plain text (.txt)</option>
+        <option value="md">Markdown (.md)</option>
+      </select>
+      <p class="form-error" id="save-error" role="alert" hidden></p>
+      <div class="button-row">
+        <button type="button" class="btn btn-secondary" value="cancel" id="save-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="save-download">Download</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Clear confirmation dialog -->
+  <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title">
+    <form method="dialog" class="stack">
+      <h2 id="confirm-title">Clear the project page?</h2>
+      <p class="justify">
+        This permanently removes the project details, every research document and every script from this page.
+        Use Save Project first if you want to keep copies. This can't be undone.
+      </p>
+      <div class="button-row">
+        <button type="submit" class="btn btn-secondary" value="cancel" autofocus>Cancel</button>
+        <button type="submit" class="btn btn-danger" value="confirm">Yes, clear everything</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

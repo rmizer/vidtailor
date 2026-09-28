@@ -1,0 +1,65 @@
+github rep --> https://github.com/rmizer/vidtailor.git
+
+
+DESIGN:
+Refer to design brief for visual specifics.
+    White background.
+    For text and elements, use color codes in design brief. If not specificed, use a color 
+    slightly lighter than perfect black.
+    Border-radius: 10px in place of sharp corners
+    Everything centered (may need review later)
+    All paragraph text justified
+    Semi-transparent section backgrounds.
+    Keywords: Bold while still soft, professional, accessible, semi-masculine.
+
+Header font is going to be Comfortaa, bold
+Regular body text is going to be Montserrat and its associated siblings
+
+SITE DESCRIPTION:
+This site allows for automated creation of resources used to put together videos for YouTube.
+This is for private use only. It needs to run in-browser and be able to access files locally as
+well as create file formats including docx, text, and so forth.
+
+Important: The site should retain whatever information was left on it the last time it was used and NOT clear if the browser is closed or the internet connection is lost.
+
+FUNCTIONALITY:
+1) One-site Page with inline sticky menu justified left. 'logo' styling in the header.
+2) All links: no underline
+3) Menu, uppercase transformed Monsterrat, bold, readable font size in purple color, active section
+in blue with underline
+
+SECTIONS:
+
+1) Project details:
+    User input: Title
+    User input: Project description
+    User input: Keyword entry
+    Button: Save (--> Renders it as text and button text changes to "Edit" Button)
+
+2) Research:
+    This section should be separated into two sections. On the left should be the user input area detailed below.
+        
+    Left panel:
+    User input: Enter a Keyword
+    Button: Research (This button should research the keyword/subject entered in the input field. Research should
+    should be conducted intelligently and documents compiled should be concise and cite references at the end of the document.
+    Research should be 2,000 words or less excluding the cite references and any headers needed to classify the information into
+    sections.)
+
+    Right panel: Research documents (and then a list below it of generated documents.  If more than one research document is
+    generated for a subject, it should ammend the file names with a number. These files should be downloadable.)
+
+3) Scripting:
+    This section should be separated into two sections. On the left should be the user input area detailed below. This section should allow for the user to choose what research documents they went to include in the Scripting process.
+
+    Left panel:
+    User Input: Script length needed. Minutes and seconds.
+    Button: Generate Script
+    The functionality of this applet should be to use the documents chosen to generate a script to narrate videos. If more than one script is generated for a subject, it should ammend the file names with a number.
+    These files should be downloadable.
+
+    Right panel: Script documents (and then a list below it of generated documents.
+
+
+4) Button: Save Project (opens a window with checkboxes that allows user to select documents to download, below that download button, button downloads chosen files to a generated folder on the local PC)
+   Button: Clear Project Page (This clears all fields. It should definitely ask for confirmation before it clears the form(s))
