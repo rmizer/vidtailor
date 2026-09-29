@@ -12,3 +12,9 @@
 - No application code was changed.
 - Created `.env` in the project root from `.env.example`. It is git-ignored, so it is not committed.
 - Still to do: `ANTHROPIC_API_KEY` in `.env` is still blank. Research will keep showing the error until a key is added and the server is restarted.
+
+## 2026-09-29 (Site 2)
+
+- Removed keywords from **Project details**: the keyword tag input, the keyword chips in the saved view, and the "From your project" keyword suggestions in Research (they came from project keywords). Keywords are now entered only in the Research section.
+- Project keywords are no longer sent to Claude as project context (`lib/claude.js`) or written to the exported `project_details.txt`. Keywords saved in the browser by earlier versions are dropped when the page loads.
+- Removed the unused keyword-chip CSS and updated `dev/decisions.md`.

@@ -20,7 +20,7 @@ Anything here can be changed; each item names the file to change.
 
 ## Persistence
 
-- Everything (project details, keyword entry, all documents, script length, selections) is saved to
+- Everything (project details, the research keyword box, all documents, script length, selections) is saved to
   the browser's **localStorage** on every keystroke and change. It survives closing the browser or
   losing the connection. It is tied to this browser and this address (`http://localhost:3000`):
   another browser, or a different port, starts empty.
@@ -32,10 +32,9 @@ Anything here can be changed; each item names the file to change.
 
 ## Project details section
 
-- **Title is required** to Save (it names the script files and the save folder). Description and
-  keywords are optional.
-- **Keywords are entered as tags:** press Enter or a comma. Backspace on an empty box removes the last tag.
-- Saved keywords also appear as one-click suggestions in the Research section.
+- **Title is required** to Save (it names the script files and the save folder). Description is optional.
+- **No keywords here.** Keywords live only in the Research section, one per research request
+  (removed from project details on 2026-09-29).
 
 ## Research
 

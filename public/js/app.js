@@ -8,7 +8,7 @@ const $ = (id) => document.getElementById(id);
 // ---------- State (persisted to localStorage on every change) ----------
 
 const defaultState = () => ({
-  project: { title: "", description: "", keywords: [], saved: false },
+  project: { title: "", description: "", saved: false },
   research: { keyword: "", docs: [], activeId: null },
   scripts: { minutes: 5, seconds: 0, selectedIds: [], docs: [], activeId: null },
 });
@@ -18,8 +18,10 @@ function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
     if (saved && typeof saved === "object") {
+      // Older saves had project keywords; research now handles keywords on its own.
+      const { keywords: _unused, ...project } = saved.project ?? {};
       return {
-        project: { ...base.project, ...saved.project },
+        project: { ...base.project, ...project },
         research: { ...base.research, ...saved.research },
         scripts: { ...base.scripts, ...saved.scripts },
       };
@@ -177,56 +179,14 @@ function initMenu() {
 
 // ---------- 1) Project details ----------
 
-function addKeyword(raw) {
-  const words = String(raw)
-    .split(",")
-    .map((w) => w.trim())
-    .filter(Boolean);
-  let changed = false;
-  for (const word of words) {
-    if (!state.project.keywords.some((k) => k.toLowerCase() === word.toLowerCase())) {
-      state.project.keywords.push(word);
-      changed = true;
-    }
-  }
-  if (changed) {
-    persist();
-    renderKeywords();
-    renderSuggestions();
-  }
-}
-
-function removeKeyword(index) {
-  state.project.keywords.splice(index, 1);
-  persist();
-  renderKeywords();
-  renderSuggestions();
-}
-
-function renderKeywords() {
-  $("keyword-chips").replaceChildren(
-    ...state.project.keywords.map((k, i) =>
-      el(
-        "li",
-        { class: "chip" },
-        k,
-        el("button", { type: "button", class: "chip-remove", "aria-label": `Remove ${k}`, onclick: () => removeKeyword(i) }, "×"),
-      ),
-    ),
-  );
-}
-
 function renderProject() {
   const p = state.project;
   $("project-form").hidden = p.saved;
   $("project-view").hidden = !p.saved;
   $("project-title").value = p.title;
   $("project-description").value = p.description;
-  renderKeywords();
   $("view-title").textContent = p.title;
   $("view-description").textContent = p.description || "No description yet.";
-  $("view-keywords").replaceChildren(...p.keywords.map((k) => el("li", { class: "chip" }, k)));
-  $("view-keywords").hidden = !p.keywords.length;
 }
 
 function initProject() {
@@ -239,32 +199,8 @@ function initProject() {
     persist();
   });
 
-  const kwInput = $("keyword-input");
-  kwInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addKeyword(kwInput.value);
-      kwInput.value = "";
-    } else if (e.key === "Backspace" && !kwInput.value && state.project.keywords.length) {
-      removeKeyword(state.project.keywords.length - 1);
-    }
-  });
-  kwInput.addEventListener("blur", () => {
-    if (kwInput.value.trim()) {
-      addKeyword(kwInput.value);
-      kwInput.value = "";
-    }
-  });
-  $("keyword-box").addEventListener("click", (e) => {
-    if (e.target.id === "keyword-box") kwInput.focus();
-  });
-
   $("project-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    if (kwInput.value.trim()) {
-      addKeyword(kwInput.value);
-      kwInput.value = "";
-    }
     const error = $("project-error");
     if (!state.project.title.trim()) {
       error.textContent = "Please enter a title before saving.";
@@ -360,32 +296,9 @@ function confirmDelete(doc, remove) {
 
 let researchBusy = false;
 
-function renderSuggestions() {
-  const keywords = state.project.keywords;
-  $("research-suggestions").hidden = !keywords.length;
-  $("suggestion-chips").replaceChildren(
-    ...keywords.map((k) =>
-      el(
-        "li",
-        {},
-        el("button", {
-          type: "button",
-          class: "chip",
-          onclick: () => {
-            $("research-keyword").value = k;
-            state.research.keyword = k;
-            persist();
-          },
-        }, k),
-      ),
-    ),
-  );
-}
-
 function renderResearch() {
   const r = state.research;
   $("research-keyword").value = r.keyword;
-  renderSuggestions();
   const active = r.docs.find((d) => d.id === r.activeId) || r.docs[r.docs.length - 1];
   renderViewer($("research-viewer"), active, "Research documents will appear here.");
   renderDocList($("research-list"), r.docs, active?.id, {
@@ -613,8 +526,6 @@ function projectDetailsText() {
     "",
     "Description:",
     p.description || "(none)",
-    "",
-    `Keywords: ${p.keywords.join(", ") || "(none)"}`,
     "",
     `Saved from vidTailor on ${new Date().toLocaleString()}`,
   ].join("\r\n");

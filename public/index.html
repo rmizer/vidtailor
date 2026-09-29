@@ -42,12 +42,6 @@
         <label for="project-description">Project description</label>
         <textarea id="project-description" rows="5" placeholder="What is this video about, who is it for, and what should viewers take away?"></textarea>
 
-        <label for="keyword-input">Keywords</label>
-        <div class="chip-input" id="keyword-box">
-          <ul class="chips" id="keyword-chips"></ul>
-          <input id="keyword-input" type="text" placeholder="Type a keyword and press Enter" autocomplete="off">
-        </div>
-
         <p class="form-error" id="project-error" role="alert" hidden></p>
         <button type="submit" class="btn btn-primary">Save</button>
       </form>
@@ -55,7 +49,6 @@
       <div id="project-view" class="stack narrow" hidden>
         <h3 id="view-title" class="project-title"></h3>
         <p id="view-description" class="justify"></p>
-        <ul class="chips chips-static" id="view-keywords"></ul>
         <button type="button" id="project-edit" class="btn btn-secondary">Edit</button>
       </div>
     </section>
@@ -68,10 +61,6 @@
           <form id="research-form" class="stack" novalidate>
             <label for="research-keyword">Enter a keyword</label>
             <input id="research-keyword" type="text" maxlength="300" placeholder="Subject to research" autocomplete="off">
-            <div id="research-suggestions" class="suggestions" hidden>
-              <span class="hint">From your project:</span>
-              <ul class="chips" id="suggestion-chips"></ul>
-            </div>
             <button type="submit" class="btn btn-primary" id="research-btn">Research</button>
             <p class="status" id="research-status" role="status" aria-live="polite"></p>
           </form>
