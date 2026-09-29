@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import JSZip from "jszip";
 import { HttpError, hasCredentials, research, writeScript } from "./lib/claude.js";
+import { cleanRelayReply, djResearch, jordanPrompt, mimiPrompt, planRun, reviewScript, teamStatus } from "./lib/agents.js";
 import { markdownToDocx } from "./lib/docx-export.js";
 import { markdownToPlain } from "./public/js/markdown.js";
 
@@ -54,6 +55,79 @@ app.post("/api/script", async (req, res) => {
     content: requireText(d?.content, "Document content", 200000),
   }));
   res.json(await writeScript({ project, documents: docs, minutes, seconds }));
+});
+
+// ---------- Agent team ----------
+
+const runLength = (body) => {
+  const minutes = Math.max(0, Math.floor(Number(body?.minutes) || 0));
+  const seconds = Math.max(0, Math.min(59, Math.floor(Number(body?.seconds) || 0)));
+  if (minutes * 60 + seconds < 10) throw new HttpError(400, "Script length must be at least 10 seconds.");
+  if (minutes > 180) throw new HttpError(400, "Script length must be 3 hours or less.");
+  return { minutes, seconds };
+};
+
+const requirePlan = (plan) => {
+  if (!plan?.dj || !plan?.mimi) throw new HttpError(400, "Jayen's plan is missing. Start the run again.");
+  return plan;
+};
+
+const requireDocs = (documents) => {
+  if (!Array.isArray(documents) || !documents.length) throw new HttpError(400, "No research documents yet.");
+  return documents.map((d) => ({
+    name: requireText(d?.name, "Document name", 300),
+    content: requireText(d?.content, "Document content", 200000),
+  }));
+};
+
+app.get("/api/agents/status", async (_req, res) => {
+  res.json(await teamStatus());
+});
+
+app.post("/api/agents/plan", async (req, res) => {
+  const subject = requireText(req.body?.subject, "Subject", 300);
+  res.json(await planRun({ subject, project: req.body?.project, ...runLength(req.body) }));
+});
+
+app.post("/api/agents/dj", async (req, res) => {
+  const subject = requireText(req.body?.subject, "Subject", 300);
+  res.json(await djResearch({ subject, project: req.body?.project, plan: requirePlan(req.body?.plan) }));
+});
+
+app.post("/api/agents/prompt/mimi", (req, res) => {
+  const subject = requireText(req.body?.subject, "Subject", 300);
+  res.json({ prompt: mimiPrompt({ subject, project: req.body?.project, plan: requirePlan(req.body?.plan) }) });
+});
+
+app.post("/api/agents/prompt/jordan", (req, res) => {
+  const subject = requireText(req.body?.subject, "Subject", 300);
+  res.json({
+    prompt: jordanPrompt({
+      subject,
+      project: req.body?.project,
+      plan: req.body?.plan,
+      documents: requireDocs(req.body?.documents),
+      attach: Boolean(req.body?.attach),
+      ...runLength(req.body),
+    }),
+  });
+});
+
+app.post("/api/agents/relay", (req, res) => {
+  res.json(cleanRelayReply(requireText(req.body?.text, "Reply", 300000)));
+});
+
+app.post("/api/agents/review", async (req, res) => {
+  const subject = requireText(req.body?.subject, "Subject", 300);
+  res.json(
+    await reviewScript({
+      subject,
+      plan: req.body?.plan,
+      script: requireText(req.body?.script, "Script", 300000),
+      documents: requireDocs(req.body?.documents),
+      ...runLength(req.body),
+    }),
+  );
 });
 
 async function renderFile(content, format, title) {

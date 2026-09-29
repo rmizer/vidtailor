@@ -19,6 +19,7 @@
   <nav class="menu" aria-label="Sections">
     <div class="menu-inner">
       <a href="#project" data-section="project">Project details</a>
+      <a href="#agents" data-section="agents">Agents</a>
       <a href="#research" data-section="research">Research</a>
       <a href="#scripting" data-section="scripting">Scripting</a>
       <a href="#save" data-section="save">Save</a>
@@ -27,8 +28,9 @@
 
   <main>
     <div id="api-banner" class="banner" hidden>
-      No Anthropic API key found on the server, so Research and Generate Script won't work yet.
-      Add <code>ANTHROPIC_API_KEY</code> to the <code>.env</code> file and restart the app (see README.md).
+      No Anthropic API key found on the server, so the Research and Generate Script buttons won't work yet.
+      The Agent team doesn't need one. To use the buttons, add <code>ANTHROPIC_API_KEY</code> to the
+      <code>.env</code> file and restart the app (see README.md).
     </div>
 
     <!-- 1) Project details -->
@@ -50,6 +52,51 @@
         <h3 id="view-title" class="project-title"></h3>
         <p id="view-description" class="justify"></p>
         <button type="button" id="project-edit" class="btn btn-secondary">Edit</button>
+      </div>
+    </section>
+
+    <!-- Agent team -->
+    <section id="agents" class="section">
+      <h2>Agent team</h2>
+      <p class="hint justify team-intro">
+        Jayen plans the video and hands out the work. DJ and Mimi each research a different angle, and Jordan
+        writes the script from both briefs. Jayen then reviews it. Jayen and DJ run on this PC by themselves.
+        Mimi and Jordan work in Microsoft Copilot: copy their prompt into Copilot, then paste the reply back here.
+      </p>
+      <ul class="team" id="team"></ul>
+
+      <div class="split">
+        <div class="panel panel-input">
+          <form id="run-form" class="stack" novalidate>
+            <label for="run-subject">Video subject</label>
+            <input id="run-subject" type="text" maxlength="300" placeholder="What should the team research?" autocomplete="off">
+
+            <fieldset>
+              <legend>Script length needed</legend>
+              <div class="duration">
+                <label>
+                  <input id="run-minutes" type="number" min="0" max="180" step="1" inputmode="numeric">
+                  <span>minutes</span>
+                </label>
+                <label>
+                  <input id="run-seconds" type="number" min="0" max="59" step="1" inputmode="numeric">
+                  <span>seconds</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <button type="submit" class="btn btn-primary" id="run-btn">Start run</button>
+            <p class="status" id="run-status" role="status" aria-live="polite"></p>
+          </form>
+          <p class="hint justify">
+            Research lands in the Research list and the script in the Scripting list, so you can download,
+            save or reuse them like any other document.
+          </p>
+        </div>
+
+        <div class="panel panel-output">
+          <ol class="run-board" id="run-board"></ol>
+        </div>
       </div>
     </section>
 
@@ -166,7 +213,7 @@
     <form method="dialog" class="stack">
       <h2 id="confirm-title">Clear the project page?</h2>
       <p class="justify">
-        This permanently removes the project details, every research document and every script from this page.
+        This permanently removes the project details, every research document, every script and the agent run from this page.
         Use Save Project first if you want to keep copies. This can't be undone.
       </p>
       <div class="button-row">

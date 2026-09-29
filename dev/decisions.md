@@ -58,6 +58,27 @@ Anything here can be changed; each item names the file to change.
   then `_2`, `_3`…
 - Length limits: 10 seconds to 180 minutes. At least one research document must be selected.
 
+## Agent team (added 2026-09-29)
+
+- **Jayen and DJ use the local CLIs**, not API keys: `claude -p` (Claude Code, your subscription) and
+  `agy --print` (Google Antigravity CLI, your Google sign-in; it replaced the Gemini CLI). The server
+  runs them from a neutral temp folder (`%TEMP%\vidtailor-agents`) so they don't pick up this repo's
+  files. Claude gets no tools; agy runs in read-only plan mode, so it can search the web but can't
+  change files. It can only open web pages because `"read_url(*)"` is allowed in
+  `~/.gemini/antigravity-cli/settings.json`; terminal commands stay blocked. Any
+  `ANTHROPIC_API_KEY` in `.env` is hidden from the Claude CLI so it bills your subscription.
+- **Mimi and Jordan are relay agents** because Microsoft Copilot has no CLI or API for personal
+  accounts. The page shows each prompt with Copy and Open Copilot buttons and a box for the reply.
+- **Jordan's research goes as file attachments** when the full prompt is over 10,000 characters,
+  since Copilot limits message length. There's a checkbox to switch modes.
+- **Order:** Jayen plans, then DJ starts automatically while Mimi's prompt is ready at the same
+  time. Jordan's prompt opens once both have delivered or been skipped. Jayen reviews each script
+  Jordan delivers; a review that asks for changes offers a revision message for the same Copilot chat.
+- Agent output is saved as ordinary documents (`research_<subject>_dj`, `research_<subject>_mimi`,
+  `script_<title>`) tagged "by DJ", "by Mimi" or "by Jordan".
+- A step that's running when the page closes can't be resumed; it shows "Interrupted" with Try again.
+- Jayen's review lives on the Agents board only and isn't in Save Project.
+
 ## Downloads and Save Project
 
 - Every document can be downloaded individually as **.docx, .txt or .md**.
